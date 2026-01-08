@@ -16,6 +16,9 @@ export class Entreprise extends Document {
   @Prop()
   adresse: string;
 
+  @Prop()
+  authCode: string;
+
   @Prop({ required: true })
   password: string; // hashed
 

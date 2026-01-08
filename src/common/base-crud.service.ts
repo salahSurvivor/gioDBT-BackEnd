@@ -18,15 +18,15 @@ export class BaseCrudService<T extends Document> {
     const { authCode } = query;
     const { currentPage, paginatorNumber } = dto;
 
-    // 🔥 détecter automatiquement tous les champs avec un ref
+    // détecter automatiquement tous les champs avec un ref
     const populateFields = Object.values(this.model.schema.paths)
       .filter((p: any) => p.options?.ref)
       .map((p: any) => ({ path: p.path, select: 'nom' }));
 
-    // 1️⃣ total des documents
+    // total des documents
     const total = await this.model.countDocuments({ authCode });
 
-    // 2️⃣ données paginées
+    // données paginées
     let queryBuilder = this.model
       .find({ authCode })
       .sort({ _id: -1 })
@@ -39,7 +39,7 @@ export class BaseCrudService<T extends Document> {
 
     const data = await queryBuilder.lean().exec();
 
-    // 3️⃣ retourner total + data
+    // retourner total + data
     return {
       total,
       data

@@ -4,7 +4,7 @@ import { VehiculeMarqueService } from '../flotte/vehicule-marque/vehicule-marque
 import { VehiculeModeleService } from '../flotte/vehicule-modele/vehicule-modele.service';
 import { VehiculeCarburantService } from '../flotte/vehicule-carburant/vehicule-carburant.service';
 
-@Controller('flotte/:entity') // endpoint dynamique
+@Controller(':entity') // endpoint dynamique
 export class GenericController {
   constructor(
     private readonly vehiculeService: VehiculeService,
@@ -14,7 +14,6 @@ export class GenericController {
   ) {}
 
   private getService(entity: string) {
-    console.log('entity: ', entity)
     switch (entity) {
       case 'vehicule':
         return this.vehiculeService; 

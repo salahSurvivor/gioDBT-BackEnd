@@ -32,6 +32,7 @@ export class authService {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const totalEnreprise = await this.entrepriseModel.countDocuments({});
 
     const entreprise = new this.entrepriseModel({
       entrepriseNom,
@@ -39,6 +40,7 @@ export class authService {
       telephone,
       adresse,
       password: hashedPassword,
+      authCode: entrepriseNom + '-' + (totalEnreprise + 1)
     });
 
     return entreprise.save();
@@ -91,6 +93,7 @@ export class authService {
           role: 'entreprise',
           entrepriseNom: entreprise.entrepriseNom,
           email: entreprise.email,
+          authCode: entreprise.authCode,
         },
         'secret',
         { expiresIn: '4h' }
