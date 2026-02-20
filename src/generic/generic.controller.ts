@@ -3,6 +3,7 @@ import { VehiculeService } from '../flotte/vehicule/vehicule.service';
 import { VehiculeMarqueService } from '../flotte/vehicule-marque/vehicule-marque.service';
 import { VehiculeModeleService } from '../flotte/vehicule-modele/vehicule-modele.service';
 import { VehiculeCarburantService } from '../flotte/vehicule-carburant/vehicule-carburant.service';
+import { RhCollaborateurService } from '../RH/rh-collaborateur/rh-collaborateur.service';
 
 @Controller(':entity') // endpoint dynamique
 export class GenericController {
@@ -10,7 +11,8 @@ export class GenericController {
     private readonly vehiculeService: VehiculeService,
     private readonly vehiculeMarqueService: VehiculeMarqueService,
     private readonly vehiculeModeleService: VehiculeModeleService,
-    private readonly vehiculeCarburantService: VehiculeCarburantService
+    private readonly vehiculeCarburantService: VehiculeCarburantService,
+    private readonly rhCollaborateurService: RhCollaborateurService
   ) {}
 
   private getService(entity: string) {
@@ -23,6 +25,8 @@ export class GenericController {
         return this.vehiculeModeleService;
       case 'vehicule-carburant':
         return this.vehiculeCarburantService;
+      case 'rh-collaborateur':
+        return this.rhCollaborateurService;
       default:
         throw new Error('Entity not found');
     }

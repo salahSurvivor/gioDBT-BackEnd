@@ -2,7 +2,7 @@ import { Model, Document } from 'mongoose';
 import { NotFoundException } from '@nestjs/common';
 
 export class BaseCrudService<T extends Document> {
-  constructor(private readonly model: Model<T>) {}
+  constructor(private readonly model: Model<T>) { }
 
   async create(createDto: any): Promise<T> {
     const created = new this.model(createDto);
@@ -11,12 +11,23 @@ export class BaseCrudService<T extends Document> {
 
   async findAll(query: any): Promise<T[]> {
     const authCode = query?.authCode || '';
-    return this.model.find({authCode}).exec();
+    return this.model.find({ authCode }).exec();
   }
 
   async find(query: any, dto: any): Promise<any> {
     const { authCode } = query;
-    const { currentPage, paginatorNumber } = dto;
+    const { currentPage, paginatorNumber, recordFilter } = dto;
+
+    const filter: any = { authCode };
+
+    if (recordFilter && typeof recordFilter === 'object') {
+      Object.keys(recordFilter).forEach(key => {
+        const value = recordFilter[key];
+        if (value !== null && value !== undefined && value !== '') {
+          filter[key] = value;
+        }
+      });
+    }
 
     // détecter automatiquement tous les champs avec un ref
     const populateFields = Object.values(this.model.schema.paths)
@@ -24,11 +35,11 @@ export class BaseCrudService<T extends Document> {
       .map((p: any) => ({ path: p.path, select: 'nom' }));
 
     // total des documents
-    const total = await this.model.countDocuments({ authCode });
+    const total = await this.model.countDocuments(filter);
 
     // données paginées
     let queryBuilder = this.model
-      .find({ authCode })
+      .find(filter)
       .sort({ _id: -1 })
       .limit(paginatorNumber)
       .skip((currentPage - 1) * paginatorNumber);
