@@ -32,7 +32,7 @@ export class BaseCrudService<T extends Document> {
     // détecter automatiquement tous les champs avec un ref
     const populateFields = Object.values(this.model.schema.paths)
       .filter((p: any) => p.options?.ref)
-      .map((p: any) => ({ path: p.path, select: 'nom' }));
+      .map((p: any) => ({ path: p.path }));
 
     // total des documents
     const total = await this.model.countDocuments(filter);

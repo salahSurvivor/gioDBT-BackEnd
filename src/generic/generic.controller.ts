@@ -1,8 +1,12 @@
 import { Controller, Get, Post, Body, Param, Patch, Delete, Query  } from '@nestjs/common';
+//-----------------------------------Flotte section------------------------------------
 import { VehiculeService } from '../flotte/vehicule/vehicule.service';
 import { VehiculeMarqueService } from '../flotte/vehicule-marque/vehicule-marque.service';
 import { VehiculeModeleService } from '../flotte/vehicule-modele/vehicule-modele.service';
 import { VehiculeCarburantService } from '../flotte/vehicule-carburant/vehicule-carburant.service';
+import { FlotteAffectationService } from '../flotte/flotte-affectation/flotte-affectation.service';
+
+//-----------------------------------RH section------------------------------------------
 import { RhCollaborateurService } from '../RH/rh-collaborateur/rh-collaborateur.service';
 
 @Controller(':entity') // endpoint dynamique
@@ -12,11 +16,13 @@ export class GenericController {
     private readonly vehiculeMarqueService: VehiculeMarqueService,
     private readonly vehiculeModeleService: VehiculeModeleService,
     private readonly vehiculeCarburantService: VehiculeCarburantService,
-    private readonly rhCollaborateurService: RhCollaborateurService
+    private readonly rhCollaborateurService: RhCollaborateurService,
+    private readonly flotteAffectationService: FlotteAffectationService
   ) {}
 
   private getService(entity: string) {
     switch (entity) {
+      //------------------Flotte Section----------------------
       case 'vehicule':
         return this.vehiculeService; 
       case 'vehicule-marque':
@@ -25,6 +31,9 @@ export class GenericController {
         return this.vehiculeModeleService;
       case 'vehicule-carburant':
         return this.vehiculeCarburantService;
+      case 'flotte-affectation':
+        return this.flotteAffectationService;
+      //---------------------RH Section-----------------------
       case 'rh-collaborateur':
         return this.rhCollaborateurService;
       default:
