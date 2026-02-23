@@ -1,15 +1,19 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, Query  } from '@nestjs/common';
+﻿import { Controller, Get, Post, Body, Param, Patch, Delete, Query } from '@nestjs/common';
 //-----------------------------------Flotte section------------------------------------
 import { VehiculeService } from '../flotte/vehicule/vehicule.service';
 import { VehiculeMarqueService } from '../flotte/vehicule-marque/vehicule-marque.service';
 import { VehiculeModeleService } from '../flotte/vehicule-modele/vehicule-modele.service';
 import { VehiculeCarburantService } from '../flotte/vehicule-carburant/vehicule-carburant.service';
 import { FlotteAffectationService } from '../flotte/flotte-affectation/flotte-affectation.service';
+import { FlotteAssuranceService } from '../flotte/flotte-assurance/flotte-assurance.service';
+import { FlotteAdblueService } from '../flotte/flotte-adblue/flotte-adblue.service';
+import { AssuranceCompagnieService } from '../flotte/assurance-compagnie/assurance-compagnie.service';
+import { AssuranceTypeService } from '../flotte/assurance-type/assurance-type.service';
 
 //-----------------------------------RH section------------------------------------------
 import { RhCollaborateurService } from '../RH/rh-collaborateur/rh-collaborateur.service';
 
-@Controller(':entity') // endpoint dynamique
+@Controller(':entity')
 export class GenericController {
   constructor(
     private readonly vehiculeService: VehiculeService,
@@ -17,14 +21,18 @@ export class GenericController {
     private readonly vehiculeModeleService: VehiculeModeleService,
     private readonly vehiculeCarburantService: VehiculeCarburantService,
     private readonly rhCollaborateurService: RhCollaborateurService,
-    private readonly flotteAffectationService: FlotteAffectationService
+    private readonly flotteAffectationService: FlotteAffectationService,
+    private readonly flotteAssuranceService: FlotteAssuranceService,
+    private readonly flotteAdblueService: FlotteAdblueService,
+    private readonly assuranceCompagnieService: AssuranceCompagnieService,
+    private readonly assuranceTypeService: AssuranceTypeService,
   ) {}
 
   private getService(entity: string) {
     switch (entity) {
       //------------------Flotte Section----------------------
       case 'vehicule':
-        return this.vehiculeService; 
+        return this.vehiculeService;
       case 'vehicule-marque':
         return this.vehiculeMarqueService;
       case 'vehicule-modele':
@@ -33,6 +41,14 @@ export class GenericController {
         return this.vehiculeCarburantService;
       case 'flotte-affectation':
         return this.flotteAffectationService;
+      case 'flotte-assurance':
+        return this.flotteAssuranceService;
+      case 'flotte-adblue':
+        return this.flotteAdblueService;
+      case 'assurance-compagnie':
+        return this.assuranceCompagnieService;
+      case 'assurance-type':
+        return this.assuranceTypeService;
       //---------------------RH Section-----------------------
       case 'rh-collaborateur':
         return this.rhCollaborateurService;
@@ -45,8 +61,7 @@ export class GenericController {
   create(@Param('entity') entity: string, @Body() dto: any, @Query() query: any) {
     const { paginatorSystem } = query;
     const service = this.getService(entity);
-    if (paginatorSystem)
-      return service.find(query, dto);
+    if (paginatorSystem) return service.find(query, dto);
 
     return service.create(dto);
   }
@@ -60,6 +75,21 @@ export class GenericController {
         vehiculeCarburantList: await this.vehiculeCarburantService.findAll(query),
       };
     }
+
+    if (entity === 'flotte-assurance') {
+      return {
+        vehiculeList: await this.vehiculeService.findAll(query),
+        assuranceCompagnieList: await this.assuranceCompagnieService.findAll(query),
+        assuranceTypeList: await this.assuranceTypeService.findAll(query),
+      };
+    }
+
+    if (entity === 'flotte-adblue') {
+      return {
+        vehiculeList: await this.vehiculeService.findAll(query),
+      };
+    }
+
     const service = this.getService(entity);
     return service.findAll(query);
   }
