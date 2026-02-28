@@ -1,4 +1,12 @@
-import { Controller, Post, Body, Get, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Req,
+  UseGuards,
+  ForbiddenException,
+} from '@nestjs/common';
 import { authService } from './auth.service';
 import { RegisterMemberDto } from './dto/register-member.dto';
 import { JwtAuthGuard } from '../common/guards/jwt.guard';
@@ -34,7 +42,17 @@ export class authController {
   // INVITE
   @UseGuards(JwtAuthGuard)
   @Post('invite-member')
-  generateInvite(@Req() req) {
-    return this.authService.generateInviteToken(req.user.id);
+  generateInvite(
+    @Req() req,
+    @Body() body: { permission?: 'admin' | 'editor' | 'viewer' },
+  ) {
+    if (req.user.role !== 'entreprise') {
+      throw new ForbiddenException('Seule une entreprise peut inviter un membre');
+    }
+
+    return this.authService.generateInviteToken(
+      req.user.id,
+      body?.permission || 'viewer',
+    );
   }
 }
