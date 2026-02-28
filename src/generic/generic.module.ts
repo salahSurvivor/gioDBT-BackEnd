@@ -8,11 +8,15 @@ import { VehiculeCarburantModule } from '../flotte/vehicule-carburant/vehicule-c
 import { FlotteAffectationModule } from '../flotte/flotte-affectation/flotte-affectation.module';
 import { FlotteAssuranceModule } from '../flotte/flotte-assurance/flotte-assurance.module';
 import { FlotteAdblueModule } from '../flotte/flotte-adblue/flotte-adblue.module';
+import { FlotteVignetteModule } from '../flotte/flotte-vignette/flotte-vignette.module';
 import { AssuranceCompagnieModule } from '../flotte/assurance-compagnie/assurance-compagnie.module';
 import { AssuranceTypeModule } from '../flotte/assurance-type/assurance-type.module';
+import { ContratLocationModule } from '../facture/contrat-location/contrat-location.module';
+import { FactureClientModule } from '../facture/facture-client/facture-client.module';
 
 //--------------------------RH Section-----------------------------
 import { RhCollaborateurModule } from '../RH/rh-collaborateur/rh-collaborateur.module';
+import { RhClientModule } from '../RH/rh-client/rh-client.module';
 
 @Module({
   imports: [
@@ -23,9 +27,13 @@ import { RhCollaborateurModule } from '../RH/rh-collaborateur/rh-collaborateur.m
     FlotteAffectationModule,
     FlotteAssuranceModule,
     FlotteAdblueModule,
+    FlotteVignetteModule,
     AssuranceCompagnieModule,
     AssuranceTypeModule,
     RhCollaborateurModule,
+    RhClientModule,
+    ContratLocationModule,
+    FactureClientModule,
   ],
   controllers: [GenericController],
 })

@@ -7,8 +7,12 @@ import { VehiculeCarburantService } from '../flotte/vehicule-carburant/vehicule-
 import { FlotteAffectationService } from '../flotte/flotte-affectation/flotte-affectation.service';
 import { FlotteAssuranceService } from '../flotte/flotte-assurance/flotte-assurance.service';
 import { FlotteAdblueService } from '../flotte/flotte-adblue/flotte-adblue.service';
+import { FlotteVignetteService } from '../flotte/flotte-vignette/flotte-vignette.service';
 import { AssuranceCompagnieService } from '../flotte/assurance-compagnie/assurance-compagnie.service';
 import { AssuranceTypeService } from '../flotte/assurance-type/assurance-type.service';
+import { RhClientService } from '../RH/rh-client/rh-client.service';
+import { ContratLocationService } from '../facture/contrat-location/contrat-location.service';
+import { FactureClientService } from '../facture/facture-client/facture-client.service';
 
 //-----------------------------------RH section------------------------------------------
 import { RhCollaborateurService } from '../RH/rh-collaborateur/rh-collaborateur.service';
@@ -24,8 +28,12 @@ export class GenericController {
     private readonly flotteAffectationService: FlotteAffectationService,
     private readonly flotteAssuranceService: FlotteAssuranceService,
     private readonly flotteAdblueService: FlotteAdblueService,
+    private readonly flotteVignetteService: FlotteVignetteService,
     private readonly assuranceCompagnieService: AssuranceCompagnieService,
     private readonly assuranceTypeService: AssuranceTypeService,
+    private readonly rhClientService: RhClientService,
+    private readonly contratLocationService: ContratLocationService,
+    private readonly factureClientService: FactureClientService,
   ) {}
 
   private getService(entity: string) {
@@ -45,10 +53,18 @@ export class GenericController {
         return this.flotteAssuranceService;
       case 'flotte-adblue':
         return this.flotteAdblueService;
+      case 'flotte-vignette':
+        return this.flotteVignetteService;
       case 'assurance-compagnie':
         return this.assuranceCompagnieService;
       case 'assurance-type':
         return this.assuranceTypeService;
+      case 'rh-client':
+        return this.rhClientService;
+      case 'facture-contrat-location':
+        return this.contratLocationService;
+      case 'facture-client':
+        return this.factureClientService;
       //---------------------RH Section-----------------------
       case 'rh-collaborateur':
         return this.rhCollaborateurService;
@@ -87,6 +103,27 @@ export class GenericController {
     if (entity === 'flotte-adblue') {
       return {
         vehiculeList: await this.vehiculeService.findAll(query),
+      };
+    }
+
+    if (entity === 'flotte-vignette') {
+      return {
+        vehiculeList: await this.vehiculeService.findAll(query),
+      };
+    }
+
+    if (entity === 'facture-contrat-location') {
+      return {
+        vehiculeList: await this.vehiculeService.findAll(query),
+        clientList: await this.rhClientService.findAll(query),
+      };
+    }
+
+    if (entity === 'facture-client') {
+      return {
+        vehiculeList: await this.vehiculeService.findAll(query),
+        clientList: await this.rhClientService.findAll(query),
+        locationList: await this.contratLocationService.findAll(query),
       };
     }
 
