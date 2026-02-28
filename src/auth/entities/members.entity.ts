@@ -1,6 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
+export type MemberPermission = 'admin' | 'editor' | 'viewer';
+
 @Schema()
 export class Member extends Document {
 
@@ -21,6 +23,9 @@ export class Member extends Document {
 
   @Prop()
   status: string;
+
+  @Prop({ type: String, enum: ['admin', 'editor', 'viewer'], default: 'viewer' })
+  permission: MemberPermission;
 
   @Prop({ type: Types.ObjectId, ref: 'Entreprise' })
   entrepriseId: Types.ObjectId;
