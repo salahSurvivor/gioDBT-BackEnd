@@ -10,12 +10,8 @@ import { VehiculeModeleModule } from './flotte/vehicule-modele/vehicule-modele.m
 import { VehiculeCarburantModule } from './flotte/vehicule-carburant/vehicule-carburant.module';
 import { FlotteAssuranceModule } from './flotte/flotte-assurance/flotte-assurance.module';
 import { FlotteAdblueModule } from './flotte/flotte-adblue/flotte-adblue.module';
-import { FlotteVignetteModule } from './flotte/flotte-vignette/flotte-vignette.module';
 import { AssuranceCompagnieModule } from './flotte/assurance-compagnie/assurance-compagnie.module';
 import { AssuranceTypeModule } from './flotte/assurance-type/assurance-type.module';
-import { RhClientModule } from './RH/rh-client/rh-client.module';
-import { ContratLocationModule } from './facture/contrat-location/contrat-location.module';
-import { FactureClientModule } from './facture/facture-client/facture-client.module';
 import { ProfileModule } from './profile/profile.module';
 
 @Module({
@@ -30,12 +26,8 @@ import { ProfileModule } from './profile/profile.module';
     VehiculeCarburantModule,
     FlotteAssuranceModule,
     FlotteAdblueModule,
-    FlotteVignetteModule,
     AssuranceCompagnieModule,
     AssuranceTypeModule,
-    RhClientModule,
-    ContratLocationModule,
-    FactureClientModule,
   ],
   controllers: [AppController],
   providers: [AppService],
