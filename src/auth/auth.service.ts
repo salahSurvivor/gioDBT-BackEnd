@@ -4,7 +4,6 @@ import { Model } from 'mongoose';
 import { Entreprise } from './entities/entreprises.entity';
 import { Member } from './entities/members.entity';
 import { Invitation } from './entities/invitation.entity';
-import { Collaborateur } from '../RH/rh-collaborateur/entities/rh-collaborateur.entity';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import { randomBytes } from 'crypto';
@@ -21,9 +20,6 @@ export class authService {
 
     @InjectModel(Invitation.name)
     private invitationModel: Model<Invitation>,
-
-    @InjectModel(Collaborateur.name)
-    private collaborateurModel: Model<Collaborateur>,
   ) {}
 
   // ================= REGISTER ENTREPRISE =================
@@ -52,11 +48,6 @@ export class authService {
 
   // ================= REGISTER MEMBER =================
   async registerMember(dto: RegisterMemberDto) {
-    const exists = await this.memberModel.findOne({ email: dto.email });
-    if (exists) {
-      throw new BadRequestException('Email dÃ©jÃ  utilisÃ©');
-    }
-
     const invite = await this.invitationModel.findOne({
       token: dto.inviteToken,
       used: false,
@@ -77,25 +68,6 @@ export class authService {
       password: hashedPassword,
       entrepriseId: invite.entrepriseId,
       status: 'active',
-      permission: invite.permission || 'viewer',
-    });
-
-    const entreprise = await this.entrepriseModel.findById(invite.entrepriseId);
-    if (!entreprise) {
-      throw new BadRequestException('Entreprise introuvable');
-    }
-
-    await this.collaborateurModel.create({
-      nom: dto.lastName,
-      prenom: dto.firstName,
-      cin: '',
-      email: dto.email,
-      telephone: dto.telephone,
-      authCode: entreprise.authCode,
-      actif: true,
-      memberId: member._id,
-      source: 'member',
-      permission: invite.permission || 'viewer',
     });
 
     invite.used = true;
@@ -153,10 +125,8 @@ export class authService {
         email: member.email,
         prenom: member.prenom,
         nom: member.nom,
-        permission: member.permission,
         entrepriseId: entrepriseData?._id,
         entrepriseNom: entrepriseData?.entrepriseNom,
-        authCode: entrepriseData?.authCode,
       },
       'secret',
       { expiresIn: '4h' }
@@ -166,10 +136,7 @@ export class authService {
   }
 
   // ================= INVITATION TOKEN =================
-  async generateInviteToken(
-    entrepriseId: string,
-    permission: 'admin' | 'editor' | 'viewer' = 'viewer',
-  ) {
+  async generateInviteToken(entrepriseId: string) {
     const token = randomBytes(24).toString('hex');
 
     const expiresAt = new Date();
@@ -178,7 +145,6 @@ export class authService {
     return this.invitationModel.create({
       token,
       entrepriseId,
-      permission,
       expiresAt,
       used: false,
     });

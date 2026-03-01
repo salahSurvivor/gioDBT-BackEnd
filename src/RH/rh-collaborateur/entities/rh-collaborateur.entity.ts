@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document } from 'mongoose';
 
 @Schema()
 export class Collaborateur extends Document {
@@ -24,15 +24,6 @@ export class Collaborateur extends Document {
 
   @Prop({ default: true })
   actif: boolean;
-
-  @Prop({ type: Types.ObjectId, ref: 'Member', required: false })
-  memberId?: Types.ObjectId;
-
-  @Prop({ type: String, enum: ['manual', 'member'], default: 'manual' })
-  source: 'manual' | 'member';
-
-  @Prop({ type: String, enum: ['admin', 'editor', 'viewer'], required: false })
-  permission?: 'admin' | 'editor' | 'viewer';
 
   @Prop({ default: Date.now })
   createdAt: Date;
