@@ -1,4 +1,16 @@
-﻿import { Controller, Get, Post, Body, Param, Patch, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Delete,
+  Query,
+  UseGuards,
+  Req,
+  ForbiddenException,
+} from '@nestjs/common';
 //-----------------------------------Flotte section------------------------------------
 import { VehiculeService } from '../flotte/vehicule/vehicule.service';
 import { VehiculeMarqueService } from '../flotte/vehicule-marque/vehicule-marque.service';
@@ -9,11 +21,13 @@ import { FlotteAssuranceService } from '../flotte/flotte-assurance/flotte-assura
 import { FlotteAdblueService } from '../flotte/flotte-adblue/flotte-adblue.service';
 import { AssuranceCompagnieService } from '../flotte/assurance-compagnie/assurance-compagnie.service';
 import { AssuranceTypeService } from '../flotte/assurance-type/assurance-type.service';
+import { JwtAuthGuard } from '../common/guards/jwt.guard';
 
 //-----------------------------------RH section------------------------------------------
 import { RhCollaborateurService } from '../RH/rh-collaborateur/rh-collaborateur.service';
 
 @Controller(':entity')
+@UseGuards(JwtAuthGuard)
 export class GenericController {
   constructor(
     private readonly vehiculeService: VehiculeService,
@@ -57,17 +71,71 @@ export class GenericController {
     }
   }
 
+  private canWrite(user: any): boolean {
+    if (user?.role === 'entreprise') return true;
+    if (user?.role !== 'member') return false;
+    return user?.permission === 'admin' || user?.permission === 'editor';
+  }
+
+  private canDelete(user: any): boolean {
+    if (user?.role === 'entreprise') return true;
+    if (user?.role !== 'member') return false;
+    return user?.permission === 'admin';
+  }
+
+  private ensureAuthScope(user: any): void {
+    if (user?.role === 'member' && !user?.authCode) {
+      throw new ForbiddenException('Compte membre sans scope entreprise');
+    }
+  }
+
   @Post()
-  create(@Param('entity') entity: string, @Body() dto: any, @Query() query: any) {
+  create(
+    @Param('entity') entity: string,
+    @Body() dto: any,
+    @Query() query: any,
+    @Req() req: any,
+  ) {
+    this.ensureAuthScope(req.user);
+
+    const entrepriseId =
+      req.user?.role === 'entreprise' ? req.user?.id : req.user?.entrepriseId;
+    if (entrepriseId) {
+      query.entrepriseId = entrepriseId;
+    }
+
+    if (req.user?.authCode) {
+      query.authCode = req.user.authCode;
+      if (dto && typeof dto === 'object') {
+        dto.authCode = req.user.authCode;
+      }
+    }
+
     const { paginatorSystem } = query;
     const service = this.getService(entity);
     if (paginatorSystem) return service.find(query, dto);
+
+    if (!this.canWrite(req.user)) {
+      throw new ForbiddenException('Permission insuffisante pour crÃ©er');
+    }
 
     return service.create(dto);
   }
 
   @Get()
-  async findAll(@Param('entity') entity: string, @Query() query: any) {
+  async findAll(@Param('entity') entity: string, @Query() query: any, @Req() req: any) {
+    this.ensureAuthScope(req.user);
+
+    const entrepriseId =
+      req.user?.role === 'entreprise' ? req.user?.id : req.user?.entrepriseId;
+    if (entrepriseId) {
+      query.entrepriseId = entrepriseId;
+    }
+
+    if (req.user?.authCode) {
+      query.authCode = req.user.authCode;
+    }
+
     if (entity === 'vehicule') {
       return {
         vehiculeMarqueList: await this.vehiculeMarqueService.findAll(query),
@@ -101,13 +169,38 @@ export class GenericController {
   }
 
   @Patch(':id')
-  update(@Param('entity') entity: string, @Param('id') id: string, @Body() dto: any) {
+  update(
+    @Param('entity') entity: string,
+    @Param('id') id: string,
+    @Body() dto: any,
+    @Req() req: any,
+  ) {
+    this.ensureAuthScope(req.user);
+
+    if (req.user?.authCode && dto && typeof dto === 'object') {
+      dto.authCode = req.user.authCode;
+    }
+
+    if (!this.canWrite(req.user)) {
+      throw new ForbiddenException('Permission insuffisante pour modifier');
+    }
+
     const service = this.getService(entity);
     return service.update(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('entity') entity: string, @Param('id') id: string) {
+  remove(
+    @Param('entity') entity: string,
+    @Param('id') id: string,
+    @Req() req: any,
+  ) {
+    this.ensureAuthScope(req.user);
+
+    if (!this.canDelete(req.user)) {
+      throw new ForbiddenException('Permission insuffisante pour supprimer');
+    }
+
     const service = this.getService(entity);
     return service.remove(id);
   }

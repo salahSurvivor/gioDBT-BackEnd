@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import type { MemberPermission } from './members.entity';
 
 @Schema({ timestamps: true })
 export class Invitation extends Document {
@@ -9,6 +10,9 @@ export class Invitation extends Document {
 
   @Prop({ type: Types.ObjectId, ref: 'entreprises_Comptes', required: true })
   entrepriseId: Types.ObjectId;
+
+  @Prop({ type: String, enum: ['admin', 'editor', 'viewer'], default: 'viewer' })
+  permission: MemberPermission;
 
   @Prop({ default: false })
   used: boolean;
