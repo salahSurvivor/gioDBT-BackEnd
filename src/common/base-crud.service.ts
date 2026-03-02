@@ -4,6 +4,24 @@ import { NotFoundException } from '@nestjs/common';
 export class BaseCrudService<T extends Document> {
   constructor(private readonly model: Model<T>) { }
 
+  private parseDateFilterValue(value: any): Date | null {
+    if (!value) return null;
+
+    if (typeof value === 'string') {
+      const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (match) {
+        const year = Number(match[1]);
+        const month = Number(match[2]) - 1;
+        const day = Number(match[3]);
+        const localDate = new Date(year, month, day);
+        return Number.isNaN(localDate.getTime()) ? null : localDate;
+      }
+    }
+
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+
   async create(createDto: any): Promise<T> {
     const created = new this.model(createDto);
     return created.save();
@@ -23,11 +41,42 @@ export class BaseCrudService<T extends Document> {
     if (recordFilter && typeof recordFilter === 'object') {
       Object.keys(recordFilter).forEach(key => {
         const value = recordFilter[key];
-        if (value !== null && value !== undefined && value !== '') {
-          filter[key] = value;
+        if (value === null || value === undefined || value === '') {
+          return;
         }
+
+        if (key.endsWith('From') || key.endsWith('To')) {
+          const date = this.parseDateFilterValue(value);
+          if (!date) {
+            return;
+          }
+
+          const field = key.endsWith('From')
+            ? key.slice(0, -4)
+            : key.slice(0, -2);
+
+          if (!field) {
+            return;
+          }
+
+          if (!filter[field] || typeof filter[field] !== 'object' || Array.isArray(filter[field])) {
+            filter[field] = {};
+          }
+
+          if (key.endsWith('From')) {
+            date.setHours(0, 0, 0, 0);
+            filter[field].$gte = date;
+          } else {
+            date.setHours(23, 59, 59, 999);
+            filter[field].$lte = date;
+          }
+          return;
+        }
+
+        filter[key] = value;
       });
     }
+    console.log('filtre:', filter);
 
     // détecter automatiquement tous les champs avec un ref
     const populateFields = Object.values(this.model.schema.paths)
@@ -64,7 +113,15 @@ export class BaseCrudService<T extends Document> {
   }
 
   async update(id: string, updateDto: any): Promise<T> {
-    const updated = await this.model.findByIdAndUpdate(id, updateDto, { new: true }).exec();
+    const payload = { ...(updateDto || {}) };
+    delete payload._id;
+    delete payload.id;
+    delete payload.__v;
+    delete payload.createdAt;
+
+    const updated = await this.model
+      .findByIdAndUpdate(id, payload, { new: true, runValidators: true })
+      .exec();
     if (!updated) throw new NotFoundException(`${this.model.modelName} #${id} not found`);
     return updated;
   }

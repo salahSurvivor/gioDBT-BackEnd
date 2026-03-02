@@ -12,6 +12,7 @@ import { FlotteVignetteModule } from '../flotte/flotte-vignette/flotte-vignette.
 import { AssuranceCompagnieModule } from '../flotte/assurance-compagnie/assurance-compagnie.module';
 import { AssuranceTypeModule } from '../flotte/assurance-type/assurance-type.module';
 import { RhClientModule } from '../RH/rh-client/rh-client.module';
+import { RhPosteModule } from '../RH/rh-poste/rh-poste.module';
 import { ContratLocationModule } from '../facture/contrat-location/contrat-location.module';
 import { FactureClientModule } from '../facture/facture-client/facture-client.module';
 
@@ -31,6 +32,7 @@ import { RhCollaborateurModule } from '../RH/rh-collaborateur/rh-collaborateur.m
     AssuranceCompagnieModule,
     AssuranceTypeModule,
     RhClientModule,
+    RhPosteModule,
     ContratLocationModule,
     FactureClientModule,
     RhCollaborateurModule,

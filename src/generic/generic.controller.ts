@@ -11,6 +11,7 @@ import { FlotteVignetteService } from '../flotte/flotte-vignette/flotte-vignette
 import { AssuranceCompagnieService } from '../flotte/assurance-compagnie/assurance-compagnie.service';
 import { AssuranceTypeService } from '../flotte/assurance-type/assurance-type.service';
 import { RhClientService } from '../RH/rh-client/rh-client.service';
+import { RhPosteService } from '../RH/rh-poste/rh-poste.service';
 import { ContratLocationService } from '../facture/contrat-location/contrat-location.service';
 import { FactureClientService } from '../facture/facture-client/facture-client.service';
 
@@ -32,6 +33,7 @@ export class GenericController {
     private readonly assuranceCompagnieService: AssuranceCompagnieService,
     private readonly assuranceTypeService: AssuranceTypeService,
     private readonly rhClientService: RhClientService,
+    private readonly rhPosteService: RhPosteService,
     private readonly contratLocationService: ContratLocationService,
     private readonly factureClientService: FactureClientService,
   ) {}
@@ -61,6 +63,8 @@ export class GenericController {
         return this.assuranceTypeService;
       case 'rh-client':
         return this.rhClientService;
+      case 'rh-poste':
+        return this.rhPosteService;
       case 'facture-contrat-location':
         return this.contratLocationService;
       case 'facture-client':

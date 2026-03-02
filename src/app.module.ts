@@ -15,6 +15,7 @@ import { AssuranceCompagnieModule } from './flotte/assurance-compagnie/assurance
 import { AssuranceTypeModule } from './flotte/assurance-type/assurance-type.module';
 import { ProfileModule } from './profile/profile.module';
 import { RhClientModule } from './RH/rh-client/rh-client.module';
+import { RhPosteModule } from './RH/rh-poste/rh-poste.module';
 import { ContratLocationModule } from './facture/contrat-location/contrat-location.module';
 import { FactureClientModule } from './facture/facture-client/facture-client.module';
 
@@ -34,6 +35,7 @@ import { FactureClientModule } from './facture/facture-client/facture-client.mod
     AssuranceCompagnieModule,
     AssuranceTypeModule,
     RhClientModule,
+    RhPosteModule,
     ContratLocationModule,
     FactureClientModule,
   ],
